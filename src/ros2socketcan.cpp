@@ -6,8 +6,6 @@
 #include "ros2socketcan.h"
 
 using std::placeholders::_1;
-using std::placeholders::_2;
-using std::placeholders::_3;
 
 ros2socketcan::ros2socketcan()
     : Node("ros2socketcan"), stream(ios), signals(ios, SIGINT, SIGTERM) {
@@ -40,12 +38,14 @@ ros2socketcan::ros2socketcan()
 
   stream.assign(natsock);
 
-  RCLCPP_INFO(this->get_logger(), (std::string("ROS 2 to CAN-Bus topic:") +
-                                   subscription_->get_topic_name())
-                                      .c_str());
-  RCLCPP_INFO(this->get_logger(), (std::string("CAN-Bus to ROS 2 topic:") +
-                                   publisher_->get_topic_name())
-                                      .c_str());
+  RCLCPP_INFO(
+      this->get_logger(), "%s",
+      (std::string("ROS 2 to CAN-Bus topic:") + subscription_->get_topic_name())
+          .c_str());
+  RCLCPP_INFO(
+      this->get_logger(), "%s",
+      (std::string("CAN-Bus to ROS 2 topic:") + publisher_->get_topic_name())
+          .c_str());
 
   stream.async_read_some(boost::asio::buffer(&rec_frame, sizeof(rec_frame)),
                          std::bind(&ros2socketcan::CanListener, this,
@@ -97,7 +97,7 @@ void ros2socketcan::CanSend(const can_msgs::msg::Frame msg) {
     out << std::to_string(frame1.data[j]) << std::string(" ");
   }
   out << std::endl;
-  RCLCPP_INFO(this->get_logger(), out.str().c_str());
+  RCLCPP_INFO(this->get_logger(), "%s", out.str().c_str());
   stream.async_write_some(boost::asio::buffer(&frame1, sizeof(frame1)),
                           std::bind(&ros2socketcan::CanSendConfirm, this));
 }
@@ -143,7 +143,7 @@ void ros2socketcan::CanListener(
     s << std::to_string(rec_frame.data[j]) << " ";
   }
   s << std::endl;
-  RCLCPP_INFO(this->get_logger(), s.str().c_str());
+  RCLCPP_INFO(this->get_logger(), "%s", s.str().c_str());
   publisher_->publish(frame);
 
   stream.async_read_some(boost::asio::buffer(&rec_frame, sizeof(rec_frame)),
